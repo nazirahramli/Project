@@ -1,0 +1,371 @@
+package hotelroomregistration;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+
+public class HotelRoomRegistration {
+    
+    
+
+    ArrayList<HotelRoom> roomlist = new ArrayList<HotelRoom>();
+    String header[] = new String[]{"Room ID", "Room Type", "Room Price", "Room Status"};
+    DefaultTableModel dtm = new DefaultTableModel(header, 1);
+
+    HotelRoomRegistration() {
+        
+
+        JFrame frame = new JFrame("Hotel Room Registration");
+        frame.setSize(400, 550);
+
+        JLabel jlabel = new JLabel("Room ID");
+        jlabel.setBounds(20, 10, 70, 20);
+        frame.add(jlabel);
+
+        JLabel jlabela = new JLabel("Room Type");
+        jlabela.setBounds(20, 28, 75, 20);
+        frame.add(jlabela);
+
+        JLabel jlabelb = new JLabel("Room Price");
+        jlabelb.setBounds(20, 50, 100, 20);
+        frame.add(jlabelb);
+        
+        JLabel jlabelc = new JLabel("Room Status");
+        jlabelc.setBounds(20, 70, 130, 20);
+        frame.add(jlabelc);
+
+        JTextField jtfroomID = new JTextField();
+        jtfroomID.setBounds(135, 10, 150, 20);
+        frame.add(jtfroomID);
+
+        JTextField jtfroomType = new JTextField();
+        jtfroomType.setBounds(135, 30, 150, 20);
+        frame.add(jtfroomType);
+
+        JTextField jtfroomPrice = new JTextField();
+        jtfroomPrice.setBounds(135, 50, 150, 20);
+        frame.add(jtfroomPrice);
+        
+        JTextField jtfroomStatus = new JTextField();
+        jtfroomStatus.setBounds(135, 70, 150, 20);
+        frame.add(jtfroomStatus);
+
+        JButton jbuttoninsert = new JButton("INSERT");
+        jbuttoninsert.setBounds(95, 100, 90, 20);
+        frame.add(jbuttoninsert);
+
+        JButton jbuttondelete = new JButton("DELETE");
+        jbuttondelete.setBounds(195, 100, 90, 20);
+        frame.add(jbuttondelete);
+
+        JButton jbuttonsearch = new JButton("SEARCH");
+        jbuttonsearch.setBounds(95, 130, 90, 20);
+        frame.add(jbuttonsearch);
+
+        JButton jbuttonupdate = new JButton("UPDATE");
+        jbuttonupdate.setBounds(195, 130, 90, 20);
+        frame.add(jbuttonupdate);
+
+        JButton jbuttonexit = new JButton("EXIT");
+        jbuttonexit.setBounds(150, 450, 90, 20);
+        frame.add(jbuttonexit);
+
+        
+        JTable jtable = new JTable();
+        jtable.setBounds(20, 140, 250, 250);
+        frame.add(jtable);
+        jtable.setModel(dtm);
+        JScrollPane scrollPane = new JScrollPane(jtable);
+        scrollPane.setBounds(20, 170, 350, 250);
+        frame.add(scrollPane);
+        jtable.getColumnModel().getColumn(0).setPreferredWidth(400);
+        jtable.getColumnModel().getColumn(1).setPreferredWidth(400);
+        jtable.getColumnModel().getColumn(2).setPreferredWidth(400);
+        jtable.getColumnModel().getColumn(3).setPreferredWidth(400);
+
+        jbuttoninsert.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                String roomID = jtfroomID.getText();
+                String roomType = jtfroomType.getText();
+                String roomPrice = jtfroomPrice.getText();
+                String roomStatus = jtfroomStatus.getText();
+                if (!isInteger(roomID)) {
+                    JOptionPane.showMessageDialog(frame, "ID number should only contain integer!!!");
+                    return;
+                }
+                if (roomType.length() < 1) {
+                    JOptionPane.showMessageDialog(frame, "Please insert Room Type!");
+                    return;
+                }
+
+                HotelRoom hotelroom = new HotelRoom(roomID, roomType, roomPrice, roomStatus);
+                roomlist.add(hotelroom);
+                writeData();
+            }
+        });
+
+        jbuttondelete.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                String roomID = JOptionPane.showInputDialog("ID number to delete?");
+                if (roomID != null) {
+                    System.out.println("not null");
+                    for (int i = 0; i < roomlist.size(); i++) {
+                        if (roomlist.get(i).getroomID().equalsIgnoreCase(roomID)) {
+                            roomlist.remove(i);
+                        }
+                    }
+                    writeData();
+                }
+            }
+        });
+
+        jbuttonsearch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                String roomID = JOptionPane.showInputDialog("Enter ID Number?");
+                if (roomID != null) {
+                    for (int i = 0; i < roomlist.size(); i++) {
+                        if (roomlist.get(i).getroomID().equalsIgnoreCase(roomID)) {
+                            JOptionPane.showMessageDialog(frame, "Found!!!");
+                            jtfroomID.setText(roomlist.get(i).getroomID());
+                            jtfroomType.setText(roomlist.get(i).getroomType());
+                            jtfroomPrice.setText(roomlist.get(i).getroomPrice());
+                            jtfroomStatus.setText(roomlist.get(i).getroomStatus());
+                            return;
+                        }
+                    }
+                    JOptionPane.showMessageDialog(frame, "Not Found!!!");
+                }
+            }
+        });
+
+        jbuttonupdate.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                String roomID = jtfroomID.getText();
+                String roomType = jtfroomType.getText();
+                String roomPrice = jtfroomPrice.getText();
+                String roomStatus = jtfroomStatus.getText();
+
+                if (roomID != null) {
+                    for (int i = 0; i < roomlist.size(); i++) {
+                        if (roomlist.get(i).getroomID().equalsIgnoreCase(roomID)) {
+                            roomlist.get(i).setroomType(roomType);
+                            roomlist.get(i).setroomPrice(roomPrice);
+                            roomlist.get(i).setroomStatus(roomStatus);
+                            JOptionPane.showMessageDialog(frame, "Updated!!!");
+                        }
+                    }
+                }
+                writeData();
+            }
+        });
+        jbuttonexit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                frame.setVisible(false);
+                frame.dispose();
+            }
+        });
+
+        readData();
+        jtable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = jtable.getSelectedRow();
+                jtfroomID.setText(dtm.getValueAt(row, 0).toString());
+                jtfroomType.setText(dtm.getValueAt(row, 1).toString());
+                jtfroomPrice.setText(dtm.getValueAt(row, 2).toString());
+                jtfroomStatus.setText(dtm.getValueAt(row, 3).toString());
+            }
+        });
+
+        frame.setResizable(false);
+        frame.setLocationRelativeTo(null);
+        frame.setLayout(null);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+    
+
+  
+    public static void main(String[] args) {
+        
+        JFrame frame = new JFrame("Login");
+        frame.setSize(300, 200);
+        frame.setLayout(null);
+
+        JLabel label = new JLabel("Username:");
+        label.setBounds(20, 20, 70, 20);
+        JTextField jtextfield1 = new JTextField();
+        jtextfield1.setBounds(110, 20, 150, 20);
+        JLabel labe12 = new JLabel("Password:");
+        labe12.setBounds(20, 50, 70, 20);
+        JTextField jtextfield2 = new JTextField();
+        jtextfield2.setBounds(110, 50, 150, 20);
+        JButton btnLogin = new JButton("Login");
+        btnLogin.setBounds(90, 90, 100, 20);
+        frame.add(label);
+        frame.add(jtextfield1);
+        frame.add(labe12);
+        frame.add(jtextfield2);
+        frame.add(btnLogin);
+        frame.setResizable(false);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        btnLogin.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                String name = jtextfield1.getText();
+                String pass = jtextfield2.getText();
+                if (name.equals("Nur Nazirah") && pass.equals("1234")) {
+                    HotelRoomRegistration hotelroomregistration = new HotelRoomRegistration();
+                    frame.setVisible(false);
+                    frame.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Incorrect login data");
+                }
+            }
+           
+        });
+        
+      
+    }
+    
+    void readData() {
+        try {
+            File file = new File("data.txt");
+            file.createNewFile();
+            FileReader f = new FileReader("data.txt");
+            StringBuffer sb = new StringBuffer();
+            while (f.ready()) {
+                char c = (char) f.read();
+                if (c == '-') {
+                    System.out.println(sb);
+                    String roomarray[] = sb.toString().split(",");
+                    HotelRoom room = new HotelRoom (roomarray[0], roomarray[1], roomarray[2], roomarray[3]);
+                    roomlist.add(room);
+                    sb = new StringBuffer();
+                } else {
+                    sb.append(c);
+                }
+            }
+            dtm.setRowCount(0);
+            for (int i = 0; i < roomlist.size(); i++) {
+                Object[] objs = {roomlist.get(i).getroomID(), roomlist.get(i).getroomType(), roomlist.get(i).getroomPrice(), roomlist.get(i).getroomStatus()};
+                dtm.addRow(objs);
+            }
+        } catch (IOException e) {
+        }
+    }
+    
+
+    private void writeData() {
+        try (FileWriter f = new FileWriter("data.txt")) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < roomlist.size(); i++) {
+                sb.append(roomlist.get(i).getroomID() + "," + roomlist.get(i).getroomType() + "," + roomlist.get(i).getroomPrice() + "," + roomlist.get(i).getroomStatus() + "-");
+            }
+            f.write(sb.toString());
+            f.close();
+        } catch (IOException e) {
+            return;
+        }
+        dtm.setRowCount(0);
+        for (int i = 0; i < roomlist.size(); i++) {
+            Object[] objs = {roomlist.get(i).getroomID(), roomlist.get(i).getroomType(), roomlist.get(i).getroomPrice(), roomlist.get(i).getroomStatus()};
+            dtm.addRow(objs);
+        }
+    }
+
+    public boolean isInteger(String str) {
+        if (str == null) {
+            return false;
+        }
+        int length = str.length();
+        if (length == 0) {
+            return false;
+        }
+        int i = 0;
+        if (str.charAt(0) == '-') {
+            if (length == 1) {
+                return false;
+            }
+            i = 1;
+        }
+        for (; i < length; i++) {
+            char c = str.charAt(i);
+            if (c < '0' || c > '9') {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+}
+    
+
+package hotelroomregistration;
+
+
+public class HotelRoom {
+    private String roomID;
+    String roomType, roomPrice, roomStatus;
+    
+    HotelRoom(String roomID, String roomType, String roomPrice, String roomStatus){
+        this.roomID = roomID;
+        this.roomType = roomType;
+        this.roomPrice = roomPrice;
+        this.roomStatus = roomStatus;
+    
+    }
+    
+    String getroomID(){
+        return roomID;
+    }
+    String getroomType(){
+        return roomType;
+    }
+    String getroomPrice(){
+        return roomPrice;
+    }
+    String getroomStatus(){
+        return roomStatus;
+    }
+    void setroomType(String roomType){
+        this.roomType = roomType;
+    }
+    void setroomPrice(String roomPrice){
+        this.roomPrice = roomPrice;
+    }
+    void setroomStatus(String roomStatus){
+        this.roomStatus = roomStatus;
+    }
+    
+}
+
